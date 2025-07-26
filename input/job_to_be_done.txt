@@ -1,0 +1,1 @@
+Prepare a comprehensive literature review focusing on methodologies, datasets, and performance benchmarks for Graph Neural Networks in Drug Discovery. Need to identify key approaches, compare different methods, and summarize experimental results.

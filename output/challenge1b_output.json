@@ -1,0 +1,14 @@
+{
+  "metadata": {
+    "input_documents": [
+      "drug_discovery.pdf",
+      "s11030-025-11303-6.pdf",
+      "WJARR-2024-2759.pdf"
+    ],
+    "persona": "PhD Researcher in Computational Biology specializing in machine learning applications for drug discovery. Has expertise in graph neural networks, molecular modeling, and bioinformatics. Focuses on methodological innovation and performance benchmarking.",
+    "job_to_be_done": "Prepare a comprehensive literature review focusing on methodologies, datasets, and performance benchmarks for Graph Neural Networks in Drug Discovery. Need to identify key approaches, compare different methods, and summarize experimental results.",
+    "processing_timestamp": "2025-07-26T18:15:12.713051"
+  },
+  "extracted_sections": [],
+  "subsection_analysis": []
+}

@@ -1,7 +1,7 @@
 # Round 1B: Persona-Driven Document Intelligence
 
- ## Overview
-This solution implements a persona-driven document intelligence system that extracts and ranks relevant sections from document collections based on specific persona requirements and task objectives.
+## Overview
+This solution implements a persona-driven document intelligence system that extracts and ranks relevant sections from document collections based on specific persona requirements and task objectives. It aims to provide personalized information retrieval tailored to individual user needs.
 
 ## Approach
 1. **PDF Processing**: Extract structured content from PDFs with page numbers and section titles

@@ -1,14 +1,15 @@
 import logging
-import nltk
 from typing import Dict, List
 from sklearn.feature_extraction.text import TfidfVectorizer
 import numpy as np
+import re
+from collections import Counter
 
 class PersonaAnalyzer:
     def __init__(self):
         self.logger = logging.getLogger(__name__)
         self.vectorizer = TfidfVectorizer(max_features=1000, stop_words='english')
-        
+
         # Domain-specific keywords
         self.domain_keywords = {
             'academic': ['research', 'study', 'analysis', 'methodology', 'literature', 'paper', 'journal'],
@@ -16,29 +17,18 @@ class PersonaAnalyzer:
             'technical': ['implementation', 'algorithm', 'system', 'performance', 'optimization', 'architecture'],
             'educational': ['learning', 'concept', 'understanding', 'exam', 'knowledge', 'study', 'practice']
         }
-    
+
     def analyze_persona_and_job(self, persona: str, job_to_be_done: str) -> Dict:
         """Analyze persona and job to extract requirements"""
         try:
-            # Extract key information
-            from nltk.tokenize import word_tokenize, sent_tokenize
-            import nltk
-            nltk.download('punkt', quiet=True)
+            # Minimal tokenizer fallback (no NLTK required)
+            persona_tokens = self._simple_tokenize(persona)
+            job_tokens = self._simple_tokenize(job_to_be_done)
 
-            # Fallback tokenize manually
-            persona_tokens = word_tokenize(persona.lower())
-            job_tokens = word_tokenize(job_to_be_done.lower())
-
-            
-            # Identify domain
             domain = self._identify_domain(persona, job_to_be_done)
-            
-            # Extract key terms
             key_terms = self._extract_key_terms(persona, job_to_be_done)
-            
-            # Create TF-IDF vector for the combined text
             combined_text = f"{persona} {job_to_be_done}"
-            
+
             return {
                 'domain': domain,
                 'key_terms': key_terms,
@@ -46,47 +36,38 @@ class PersonaAnalyzer:
                 'persona_type': self._classify_persona_type(persona),
                 'task_type': self._classify_task_type(job_to_be_done)
             }
-        
+
         except Exception as e:
             self.logger.error(f"Error analyzing persona: {str(e)}")
             return {}
-    
+
+    def _simple_tokenize(self, text: str) -> List[str]:
+        """Very basic word tokenizer that avoids NLTK dependency"""
+        return re.findall(r'\b[a-zA-Z]{2,}\b', text.lower())
+
     def _identify_domain(self, persona: str, job: str) -> str:
         """Identify the domain based on persona and job"""
         text = f"{persona} {job}".lower()
-        
-        domain_scores = {}
-        for domain, keywords in self.domain_keywords.items():
-            score = sum(1 for keyword in keywords if keyword in text)
-            domain_scores[domain] = score
-        
+        domain_scores = {
+            domain: sum(1 for keyword in keywords if keyword in text)
+            for domain, keywords in self.domain_keywords.items()
+        }
         return max(domain_scores, key=domain_scores.get) if domain_scores else 'general'
-    
+
     def _extract_key_terms(self, persona: str, job: str) -> List[str]:
         """Extract important terms from persona and job description"""
-        import re
-        from nltk.corpus import stopwords
-        
-        try:
-            stop_words = set(stopwords.words('english'))
-        except:
-            stop_words = set(['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with'])
-        
+        stop_words = set([
+            'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to',
+            'for', 'of', 'with', 'as', 'by', 'is', 'it', 'that', 'this'
+        ])
         text = f"{persona} {job}".lower()
-        
-        # Extract meaningful terms
         words = re.findall(r'\b[a-zA-Z]{3,}\b', text)
         key_terms = [word for word in words if word not in stop_words]
-        
-        # Return most frequent terms
-        from collections import Counter
         term_counts = Counter(key_terms)
         return [term for term, count in term_counts.most_common(10)]
-    
+
     def _classify_persona_type(self, persona: str) -> str:
-        """Classify the type of persona"""
         persona_lower = persona.lower()
-        
         if any(word in persona_lower for word in ['researcher', 'phd', 'scientist']):
             return 'researcher'
         elif any(word in persona_lower for word in ['student', 'undergraduate', 'graduate']):
@@ -97,11 +78,9 @@ class PersonaAnalyzer:
             return 'executive'
         else:
             return 'professional'
-    
+
     def _classify_task_type(self, job: str) -> str:
-        """Classify the type of task"""
         job_lower = job.lower()
-        
         if any(word in job_lower for word in ['review', 'literature', 'survey']):
             return 'review'
         elif any(word in job_lower for word in ['analyze', 'analysis']):
